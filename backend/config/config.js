@@ -1,14 +1,13 @@
-const MongoClient = require('mongodb').MongoClient;
-const url = 'mongodb://127.0.0.1:27017';
+require('dotenv').config();
+import { MongoClient } from 'mongodb';
 
-const dbName = 'Sounditi';
+const connectionString = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
 let db;
 
-MongoClient.connect(url, { useNewUrlParser: true }, (err, client) => {
-  // ... do something here
-  if (err) return log(err);
+const init = () => MongoClient.connect(connectionString, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(client => {
+    db = client.db('Sounditi');
+    return db;
+  });
 
-  db = client.db(dbName)
-  console.log(`Connected MongoDB: ${url}`);
-  console.log(`Database: ${dbName}`);
-});
+module.exports = { init };
