@@ -10,19 +10,23 @@ import songs from './routes/songs';
 import users from './routes/users';
 
 const app = express();
-const port = 3003;
-const secret = process.env.JWT_SECRET_KEY
+const port = process.env.PORT || 3003;
+const secret = process.env.JWT_SECRET_KEY;
 
 // MIDDLEWARES
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
+    res.header('Access-Control-Allow-Origin', '*');
     res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept, Authorization'
     );
+    if (req.method === 'OPTIONS') {
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+        return res.status(200).json({});
+    }
     next();
 });
 app.use(passport.initialize());
