@@ -27,18 +27,13 @@ const generateToken = async (secureUser, res) => {
         return res.cookie('jwt', token, {
             expires: new Date(Date.now() + 259200), // 3 días
             httpOnly: true
-            }).json({ jwt: token });
-        // return res.json({jwt: token });
+            }).json({ success: true, secureUser, jwt: token });
     } catch (err) {
         return new Error(err);
     }
 };
 
 const verifyToken = async (req) => {
-    // return await passport.authenticate('jwt', { session: false })
-    // return await passport.authenticate('jwt', { session: false }), (req, res) => {
-    //     console.log('jwt extracted', req.user);
-    // };
     const token = req.cookies.jwt || '';
     try {
         if (!token) {
@@ -47,7 +42,6 @@ const verifyToken = async (req) => {
         const decrypt = await jwt.verify(token, secret);
         req.user = {
             id: decrypt.id,
-            // firstname: decrypt.firstname,
         };
         next();
     } catch (error) {
@@ -73,7 +67,6 @@ passport.use('login',
             if (!isValidUser) {
                 return done(null, false, { message: 'Incorrect password.' });
             }
-            console.log('USER EN PASS ->', user);
             const { _id, userName, createdAt } = user;
             return done(null, { _id, userName, createdAt });
 
@@ -89,12 +82,12 @@ passport.use('registration',
         passwordField: 'password'
     }, async (email, password, done) => {
         try {
+            console.log('entro en use pass de resgister');
             const db = await init();
             const usersCollection = db.collection('users');
             const userExists = await usersCollection.findOne({ userName: email });
             if (userExists) {
                 return done(null, false, { message: 'Sorry,but that email has already an account.' });
-                // res.status(409).json('Sorry,but that email has already an account');
             } else {
                 const hashedPassword = await generateHashedPassword(password);
                 const customId = uuidv4().split('-').join('');
@@ -105,9 +98,7 @@ passport.use('registration',
                     createdAt: new Date(),
                 };
                 // quizá aquí el schema validate con Joi => const user = User(data)
-                //Save the information provided by the user to the the database
                 const insertNewUser = await usersCollection.insertOne(newUser);
-                //Send the user information to the next middleware
                 if (insertNewUser.result.ok === 1) {
                     const { _id, userName, createdAt } = insertNewUser.ops[0];
                     done(null, { _id, userName, createdAt }, { message: 'User created succesfully' })
@@ -120,11 +111,6 @@ passport.use('registration',
         }
     }
 ));
-
-// const opts = {
-//     jwtFromRequest: req => req.cookies && req.cookies.jwt,
-//     secretOrKey: secret,
-// };
 
 passport.use(
     'jwt',
