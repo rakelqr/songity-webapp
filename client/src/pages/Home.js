@@ -48,8 +48,8 @@ const Home = () => {
       <div>
         <Container maxWidth="sm" component="main" className={classes.heroContent}>
           <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-            Welcome to Songity
-        </Typography>
+            We introduce you to Songity
+          </Typography>
           <Typography variant="h5" align="center" color="textSecondary" component="p">
             Songity is a little web app where you can create, store and edit your own songs.
             If you would like to use it, please create an account, or if you already have one, please, login.
