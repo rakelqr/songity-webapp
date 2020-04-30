@@ -1,8 +1,33 @@
 {  
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 6
+  },
   "extends": [
-    "airbnb"
+    "airbnb",
+    "prettier"
+  ],
+  "plugins": [
+    "prettier"
   ],
   "rules": {
+    "indent": [
+      "error",
+      "tab"
+    ],
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
     "no-underscore-dangle": [
       "error",
       {
@@ -10,7 +35,6 @@
           "_id"
         ]
       }
-    ],
-    "import/no-extraneous-dependencies": 0
+    ]
   }
 }

@@ -6,15 +6,6 @@ module.exports = function (app, db) {
     const usersCollection = db.collection('users');
     console.log('entramos a users');
 
-    app.get('/second', async (req, res) => {
-        try {
-            const users = await usersCollection.find({}).toArray();
-            res.json(users)
-        } catch (err) {
-            console.error(err);
-        }
-    });
-
     // insert NEW user
     app.post('/registration', passport.authenticate('registration', { session: false }),
         async (req, res, next) => {
@@ -56,7 +47,8 @@ module.exports = function (app, db) {
         console.log('in profile, my user id ', req.user._id);
         res.json({
             user: req.user
-        }).redirect(`/profile/${req.user._id}/songs`);
+        })
+        // .redirect(`/profile/${req.user._id}/songs`);
     });
     
     app.get('logout', (req, res, next) => {

@@ -3,9 +3,7 @@ import express from 'express';
 import Joi from '@hapi/joi';
 import { passport } from '../auth/auth';
 import { v4 as uuidv4 } from 'uuid';
-import { random } from 'faker';
 
-const router = express.Router();
 const songSchema = Joi.object({
     _id: Joi.string(),
     userId: Joi.string(),
@@ -51,9 +49,9 @@ module.exports = function(app, db) {
     // app.use('/user', passport.authenticate('jwt', { session: false }));
 
     // getSongs
-    app.get('/profile/:userId/songs', async (req, res) => {
-        // console.log('here my REQ  ===> ', req);
-        const { _id } = req.user;
+    app.get('/profile/:userId', async (req, res) => {
+        // console.log('here my REQ  ===> ', req.params);
+        const { _id } = req.params.userId;
         try {
             const userSongs = songsCollection.find({ userId: _id }).toArray();
             res.status(200).json(userSongs);
@@ -63,36 +61,58 @@ module.exports = function(app, db) {
     });
 
     // createSong
-    // app.post('/:userId/songs/newSong', passport.authenticate('jwt', { session: false }), (req, res) => {
-    //     const data = req.body;
-    //     songsCollection.insertOne({
-    //         _id: random.uuid(),
-    //         userId: data.userId,
-    //         name: data.name,
-    //         session: data.session,
-    //         goodIdea: data.goodIdea,
-    //         createdDate: new Date(),
-    //         soundAttachement: songUrl,
-    //     });
-    //     // check what returns
-    //     // error
-    //     res.status(500).send("An error occured in the registration");
-    //     // everything ok
-    //     res.status(201);
-    //     // Redirection to /:userId/:songId
-    //     res.json('MESSAGE TO EDIT');
-    // });
+    app.post('/profile/:userId/createSong', passport.authenticate('jwt', { session: false }), async (req, res) => {
+        try {
+            const data = req.body;
+            const customId = await uuidv4().split('-').join('');
+            const songUrl = await getSongUploadURL(customId);
+            const insertNewSong = await songsCollection.insertOne({
+                _id: random.uuid(),
+                userId: data.userId,
+                name: data.name,
+                session: data.session,
+                goodIdea: data.goodIdea,
+                createdDate: new Date(),
+                soundAttachement: songUrl,
+            });
+            if (insertNewSong.result.ok === 1) {
+                const { _id, name, session, createdAt } = insertNewSong.ops[0];
+                res.status(201).json('Song saved succesfully', insertNewSong.ops[0]);
+            } else {
+                res.status(500).send('Error saving your song')
+            }
+        } catch (err) {
+            
+        }
+    });
 
-    // // editSong
-    // app.put('/:userId/songs/:songId', passport.authenticate('jwt', { session: false }), (req, res) => {
+    // editSong
+    app.put('/profile/:userId/editSong', passport.authenticate('jwt', { session: false }), (req, res) => {
+        try {
+            const song = req.song;
+            
+            const editSong = await songsCollection.updateOne({ _id: song._id }, { $set: song });
+            if (editSong.matchedCount === 1) {
+                res.status(200).json('Song edited succesfully');
+            }
+        } catch (err) {
+            res.status(500).json('Error while editing song');
+        }
+    });
 
-    // });
+    // deleteSong
+    app.delete('/profile/:userId/songs/deleteSong', passport.authenticate('jwt', { session: false }), async (req, res) => {
+        try {
+            const songToDelete = req.song;
+            const deleteSong = await songsCollection.deleteOne(songToDelete);
+            if (deleteSong.deletedCount === 1) {
+                res.status(200).json('Song deleted succesfully');
+            }
+        } catch (err) {
+            res.status(500).json('Error while deleting song');
+        }
+    });
 
-    // // deleteSong
-    // app.delete('/:userId/songs/:songId', passport.authenticate('jwt', { session: false }), (req, res) => {
 
-    // })
-
-
-}
+};
 
