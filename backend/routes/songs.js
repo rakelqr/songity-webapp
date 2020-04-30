@@ -87,7 +87,7 @@ module.exports = function(app, db) {
     });
 
     // editSong
-    app.put('/profile/:userId/editSong', passport.authenticate('jwt', { session: false }), (req, res) => {
+    app.put('/profile/:userId/editSong', passport.authenticate('jwt', { session: false }), async (req, res) => {
         try {
             const song = req.song;
             
