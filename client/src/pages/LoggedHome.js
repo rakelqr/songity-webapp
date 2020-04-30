@@ -1,8 +1,4 @@
 import React from 'react';
-import Card from '@material-ui/core/Card';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
@@ -20,6 +16,9 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import SongDialog from '../components/SongDialog';
+import { apiRequest } from '../utils/helpers';
+import useErrorHandler from '../hooks/useError';
+
 
 const songs = [
     {
@@ -67,6 +66,7 @@ const LoggedHome = () => {
     const [userSongs, setUserSongs] = React.useState([]);
     const [openSongDialog, setOpenSongDialog] = React.useState(false);
     const [isEditing, setIsEditing] = React.useState(false);
+    const { error, showError } = useErrorHandler(null);
 
     const closeSongDialog = () => {
         setOpenSongDialog(false);
@@ -92,7 +92,7 @@ const LoggedHome = () => {
             await apiRequest(
                 '/login',
                 'delete',
-                song,
+                songToDelete,
             );
             console.log('Clicked in en Delete');
         } catch(error) {
