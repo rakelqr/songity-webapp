@@ -52,7 +52,7 @@ export const validateLoginForm = (email, password, setError) => {
 };
 export const validateSignUpForm = async (email, password, setError) => {
     try {
-        const { error, value } = await schema.validateAsync({ email, password }, signUpSchema);
+        const { error, value } = await signUpSchema.validateAsync({ email, password }, signUpSchema);
         if (error) {
             setError(error);
             return false;
@@ -62,11 +62,11 @@ export const validateSignUpForm = async (email, password, setError) => {
         setError('There was an error while validation');
         return false;
     };
-
 };
+
 export const validateNewSongForm = async (songName, songSession, songGoodIdea, setError) => {
     try {
-        const { error, value } = await schema.validateAsync({ songName, songSession, songGoodIdea }, newSongSchema);
+        const { error, value } = await newSongSchema.validateAsync({ songName, songSession, songGoodIdea }, newSongSchema);
         if (error) {
             setError(error);
             return false;
@@ -77,7 +77,6 @@ export const validateNewSongForm = async (songName, songSession, songGoodIdea, s
         setError('There was an error while validation');
         return false;
     };
-    return true;
 };
 
 export default { 

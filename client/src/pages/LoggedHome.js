@@ -9,16 +9,17 @@ import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Table from "@material-ui/core/Table";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
-import TableBody from "@material-ui/core/TableBody";
+import Table from '@material-ui/core/Table';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+import TableBody from '@material-ui/core/TableBody';
 import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from "@material-ui/icons/Delete";
-import IconButton from "@material-ui/core/IconButton";
-import Tooltip from "@material-ui/core/Tooltip";
+import DeleteIcon from '@material-ui/icons/Delete';
+import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
+import SongDialog from '../components/SongDialog';
 
 const songs = [
     {
@@ -28,29 +29,27 @@ const songs = [
         goodIdea: true,
         soundAttachmentUrl: 'http://example.com/awesome.mp3',
     }, {
-        _id: '123',
-        name: 'test',
-        session: '242',
-        goodIdea: true,
+        _id: '345',
+        name: 'test2',
+        session: 'una',
+        goodIdea: false,
         soundAttachmentUrl: 'http://example.com/awesome.mp3',
     }, {
-        _id: '123',
-        name: 'test',
-        session: '242',
+        _id: '567',
+        name: 'test3',
+        session: 'otra',
         goodIdea: true,
         soundAttachmentUrl: 'http://example.com/awesome.mp3',
     }
 ];
 
-const onAddClicked = index => {
-    console.log('Clicked in Edit');
-};
+
 
 const onDeleteClicked = index => {
-    console.log('Clicked in Edit');
+    console.log('Clicked in Delete');
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStylesLoggedHome = makeStyles((theme) => ({
     containerOne: {
         padding: theme.spacing(8, 0, 6),
     },
@@ -65,7 +64,44 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const LoggedHome = () => {
-    const classes = useStyles();
+    const [userSongs, setUserSongs] = React.useState([]);
+    const [openSongDialog, setOpenSongDialog] = React.useState(false);
+    const [isEditing, setIsEditing] = React.useState(false);
+
+    const closeSongDialog = () => {
+        setOpenSongDialog(false);
+    };
+
+    const addSong = (e) => {
+        e.preventDefault();
+        console.log('Clicked in en Add');
+        setOpenSongDialog(true);
+    };
+
+    const editSong = (e) => {
+        e.preventDefault();
+        setIsEditing(true);
+        setOpenSongDialog(true);
+        console.log('Clicked in en Edit');
+    };
+
+    const deleteSongHandler = async (e, id) => {
+        try {
+            e.preventDefault();
+            const songToDelete = userSongs.find(song => song._id === id);
+            await apiRequest(
+                '/login',
+                'delete',
+                song,
+            );
+            console.log('Clicked in en Delete');
+        } catch(error) {
+            showError(error);
+        }
+    };
+
+
+    const classes = useStylesLoggedHome();
 
     return (
         <div>
@@ -80,7 +116,6 @@ const LoggedHome = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                {/* <TableCell>Song Id</TableCell> */}
                                 <TableCell>NAME</TableCell>
                                 <TableCell>SESSION</TableCell>
                                 <TableCell>GOOD IDEA</TableCell>
@@ -100,8 +135,8 @@ const LoggedHome = () => {
                                                 <Tooltip title="Edit song">
                                                     <IconButton
                                                         color="primary"
-                                                        onClick={() => {
-                                                            onAddClicked(index);
+                                                        onClick={(e) => {
+                                                            editSong(e, song._id);
                                                         }}
                                                     >
                                                         <EditIcon />
@@ -110,13 +145,19 @@ const LoggedHome = () => {
                                                 <Tooltip title="Delete song">
                                                     <IconButton
                                                         color="primary"
-                                                        onClick={() => {
-                                                            onDeleteClicked(index);
+                                                        onClick={(e) => {
+                                                            deleteSongHandler(e, song._id);
                                                         }}
                                                     >
                                                         <DeleteIcon />
                                                     </IconButton>
                                                 </Tooltip>
+                                                <SongDialog
+                                                    open={openSongDialog}
+                                                    handleClose={closeSongDialog}
+                                                    song={song}
+                                                    isEditing={isEditing}
+                                                />
                                             </div>
                                         )}
                                     />
@@ -127,12 +168,13 @@ const LoggedHome = () => {
                 </Grid>
                 <Grid item xs={1}>
                     <Tooltip title="Add new song">
-                        <IconButton>
+                        <IconButton onClick={e => addSong}>
                             <AddIcon color="primary" />
                         </IconButton>
                     </Tooltip>
                 </Grid>
                 </Grid>
+                <SongDialog open={openSongDialog && !isEditing} handleClose={closeSongDialog}/>
             </Container>
             {/* <Container maxWidth="md" component="main" className={classes.containerThree}>
                 <Grid>

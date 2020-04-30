@@ -9,7 +9,7 @@ import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { useStylesSignIn } from '../utils/styles';
-import { apiRequest, validateLoginForm } from '../helpers';
+import { apiRequest, validateLoginForm } from '../utils/helpers';
 import useErrorHandler from '../hooks/useError';
 import { authContext } from '../context/AuthContext';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import useAuth from '../hooks/useAuth';
-import { getStoredUserAuth } from '../helpers';
+import { getStoredUserAuth } from '../utils/helpers';
 
 export const authContext = React.createContext({ 
     auth: {
